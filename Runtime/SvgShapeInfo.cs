@@ -17,7 +17,7 @@ namespace Collider2DTools
         public Vector2 Center { get; protected set; }
         public float RotationDeg { get; protected set; }
 
-        public bool HasRotation => Mathf.Abs(RotationDeg) >= Mathf.Epsilon;
+        public bool HasRotation => !Mathf.Approximately(RotationDeg, 0f);
 
         protected SvgShapeInfo(SvgShapeKind kind, Vector2 center)
         {
