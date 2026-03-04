@@ -1,0 +1,16 @@
+<svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Test">
+<circle id="Circle" cx="4" cy="4" r="1" fill="#B300FF"/>
+<path id="H Line" d="M1 8L7 8" stroke="black" stroke-width="0.2"/>
+<g id="GroupA">
+<rect id="Rectangle 1" x="1" y="1" width="2" height="2" fill="#FF0000"/>
+<rect id="Rectangle 2" x="4.58579" y="2" width="2" height="2" transform="rotate(-45 4.58579 2)" fill="#00FF09"/>
+</g>
+<g id="GroupB">
+<path id="Line 2" d="M1 5L2.5 5L3.5 6L2.5 7L1 7" stroke="black" stroke-width="0.2"/>
+<path id="Polygon 1" d="M5.5 5H7L6 6L7 7H5.5L4.5 6L5.5 5Z" fill="#2600FF"/>
+</g>
+<path id="Polygon 2" d="M1 9H2.5C3.5 9 3.5 10 3.5 10C3.5 10 3.5 11 2.5 11H1V9Z" fill="#F7FF00"/>
+<path id="Vector 1" d="M5 11C5 11 5 9 5.5 9C6 9 6 11 6.5 11C7 11 7 9 7 9" stroke="black" stroke-width="0.2"/>
+</g>
+</svg>

@@ -1,0 +1,11 @@
+{
+    "name": "ashtonmeuser.collider-2d-tools.Tests",
+    "references": [
+        "ashtonmeuser.collider-2d-tools"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

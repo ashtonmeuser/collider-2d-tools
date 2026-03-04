@@ -1,0 +1,22 @@
+{
+  "name": "com.ashtonmeuser.collider-2d-tools",
+  "version": "0.1.0",
+  "displayName": "Collider 2D Tools",
+  "description": "Tools for working with 2D colliders in Unity.",
+  "unity": "2022.1",
+  "documentationUrl": "https://github.com/ashtonmeuser/collider-2d-tools",
+  "dependencies": {
+    "com.unity.test-framework": "1.6.0"
+  },
+  "author": {
+    "name": "Ashton Meuser",
+    "url": "https://github.com/ashtonmeuser"
+  },
+  "samples": [
+    {
+      "displayName": "Collider 2D Tools Sample",
+      "description": "A sample scene demonstrating the use of Collider 2D Tools.",
+      "path": "Samples~/Collider2DToolsSample"
+    }
+  ]
+}
