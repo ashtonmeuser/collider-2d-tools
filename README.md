@@ -1,5 +1,9 @@
 # Collider 2D Tools
 
+<p align="center">
+<img width="820" alt="SVG → COLLIDER" src="https://github.com/user-attachments/assets/0624682b-1ee2-47c3-9baf-f944d20d2c91">
+</p>
+
 Collider 2D Tools exposes two tools for working with 2D colliders in Unity. **SvgCollider2D** converts SVG shape data into Unity 2D colliders. **ColliderVisualizer2D** creates meshes for 2D colliders which enables rendering based solely on physics collider data.
 
 ## Installation
