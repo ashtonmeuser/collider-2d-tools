@@ -18,8 +18,8 @@ namespace Collider2DTools
 
             if (name == "circle")
             {
-                if (!TryParseAttr(el, "cx", out float cx) || !TryParseAttr(el, "cy", out float cy) ||
-                    !TryParseAttr(el, "r", out float r) || r <= 0f)
+                if (!TryParseFloat(el, "cx", out float cx) || !TryParseFloat(el, "cy", out float cy) ||
+                    !TryParseFloat(el, "r", out float r) || r <= 0f)
                     return null;
 
                 return new SvgCircleInfo(new Vector2(cx, -cy), r);
@@ -27,8 +27,8 @@ namespace Collider2DTools
 
             if (name == "rect")
             {
-                if (!TryParseAttr(el, "x", out float x) || !TryParseAttr(el, "y", out float y) ||
-                    !TryParseAttr(el, "width", out float w) || !TryParseAttr(el, "height", out float h) || w <= 0f || h <= 0f)
+                if (!TryParseFloat(el, "x", out float x, 0f) || !TryParseFloat(el, "y", out float y, 0f) ||
+                    !TryParseFloat(el, "width", out float w) || !TryParseFloat(el, "height", out float h) || w <= 0f || h <= 0f)
                     return null;
 
                 return new SvgRectInfo(new Rect(new Vector2(x, -y - h), new Vector2(w, h)));
@@ -52,8 +52,8 @@ namespace Collider2DTools
 
             if (name == "line")
             {
-                if (!TryParseAttr(el, "x1", out float x1) || !TryParseAttr(el, "y1", out float y1) ||
-                    !TryParseAttr(el, "x2", out float x2) || !TryParseAttr(el, "y2", out float y2))
+                if (!TryParseFloat(el, "x1", out float x1) || !TryParseFloat(el, "y1", out float y1) ||
+                    !TryParseFloat(el, "x2", out float x2) || !TryParseFloat(el, "y2", out float y2))
                     return null;
 
                 return new SvgPolylineInfo(new[]
@@ -74,8 +74,16 @@ namespace Collider2DTools
             return null;
         }
 
-        private static bool TryParseAttr(XmlElement el, string name, out float value)
-            => float.TryParse(el.GetAttribute(name), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+        private static bool TryParseFloat(XmlElement el, string name, out float value, float? defaultValue = null)
+        {
+            var attribute = el.GetAttribute(name);
+            if (string.IsNullOrWhiteSpace(attribute) && defaultValue is float v)
+            {
+                value = v;
+                return true;
+            }
+            return float.TryParse(attribute, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+        }
 
         private static bool TryParsePoints(string pointsAttr, out List<Vector2> points)
         {

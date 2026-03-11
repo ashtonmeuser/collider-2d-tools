@@ -43,6 +43,32 @@ namespace Collider2DTools.Tests
         }
 
         [Test]
+        public void Parse_Rect_MissingXAndY_DefaultsToZero()
+        {
+            XmlElement el = LoadElement("<rect width='3' height='4' />");
+
+            SvgShapeInfo shape = SvgShapeParser.Parse(el, 0.25f);
+
+            Assert.That(shape, Is.TypeOf<SvgRectInfo>());
+            var rect = ((SvgRectInfo)shape).Rect;
+            AssertVector2(rect.position, 0f, -4f);
+            AssertVector2(rect.size, 3f, 4f);
+        }
+
+        [Test]
+        public void Parse_Rect_MissingY_DefaultsToZero()
+        {
+            XmlElement el = LoadElement("<rect x='2' width='3' height='4' />");
+
+            SvgShapeInfo shape = SvgShapeParser.Parse(el, 0.25f);
+
+            Assert.That(shape, Is.TypeOf<SvgRectInfo>());
+            var rect = ((SvgRectInfo)shape).Rect;
+            AssertVector2(rect.position, 2f, -4f);
+            AssertVector2(rect.size, 3f, 4f);
+        }
+
+        [Test]
         public void Parse_Polygon_ParsesPointsAndFlipsY()
         {
             XmlElement el = LoadElement("<polygon points='0,0 2,0 1,2' />");
