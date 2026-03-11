@@ -87,7 +87,7 @@ namespace Collider2DTools
         /// Parses SVG XML text and creates colliders for supported shapes.
         /// </summary>
         /// <param name="svgXml">Raw SVG XML text.</param>
-        protected void Walk(string svgXml)
+        public void Walk(string svgXml)
         {
             var doc = new XmlDocument { XmlResolver = null }; // Avoid external entity resolution
             doc.LoadXml(svgXml);
@@ -104,7 +104,7 @@ namespace Collider2DTools
         /// Parses an SVG TextAsset and creates colliders for supported shapes.
         /// </summary>
         /// <param name="svgText">SVG asset containing XML text.</param>
-        protected void Walk(TextAsset svgText)
+        public void Walk(TextAsset svgText)
         {
             if (svgText == null) return;
             Walk(svgText.text);
@@ -114,7 +114,7 @@ namespace Collider2DTools
         /// Parses an SVG stream and creates colliders for supported shapes.
         /// </summary>
         /// <param name="svgStream">Readable stream containing SVG XML text.</param>
-        protected void Walk(Stream svgStream)
+        public void Walk(Stream svgStream)
         {
             using var reader = new StreamReader(svgStream);
             Walk(reader.ReadToEnd());
