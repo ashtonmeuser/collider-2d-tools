@@ -18,7 +18,7 @@ namespace Collider2DTools
 
             if (name == "circle")
             {
-                if (!TryParseFloat(el, "cx", out float cx) || !TryParseFloat(el, "cy", out float cy) ||
+                if (!TryParseFloat(el, "cx", out float cx, 0f) || !TryParseFloat(el, "cy", out float cy, 0f) ||
                     !TryParseFloat(el, "r", out float r) || r <= 0f)
                     return null;
 
@@ -52,8 +52,8 @@ namespace Collider2DTools
 
             if (name == "line")
             {
-                if (!TryParseFloat(el, "x1", out float x1) || !TryParseFloat(el, "y1", out float y1) ||
-                    !TryParseFloat(el, "x2", out float x2) || !TryParseFloat(el, "y2", out float y2))
+                if (!TryParseFloat(el, "x1", out float x1, 0f) || !TryParseFloat(el, "y1", out float y1, 0f) ||
+                    !TryParseFloat(el, "x2", out float x2, 0f) || !TryParseFloat(el, "y2", out float y2, 0f))
                     return null;
 
                 return new SvgPolylineInfo(new[]

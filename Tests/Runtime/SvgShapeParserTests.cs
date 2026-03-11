@@ -30,6 +30,19 @@ namespace Collider2DTools.Tests
         }
 
         [Test]
+        public void Parse_Circle_MissingCenter_DefaultsToZero()
+        {
+            XmlElement el = LoadElement("<circle r='2' />");
+
+            SvgShapeInfo shape = SvgShapeParser.Parse(el, 0.25f);
+
+            Assert.That(shape, Is.TypeOf<SvgCircleInfo>());
+            var circle = (SvgCircleInfo)shape;
+            AssertVector2(circle.Center, 0f, 0f);
+            Assert.That(circle.Radius, Is.EqualTo(2f).Within(Tolerance));
+        }
+
+        [Test]
         public void Parse_Rect_ParsesToBottomLeftRectCoordinates()
         {
             XmlElement el = LoadElement("<rect x='1' y='2' width='3' height='4' />");
@@ -92,6 +105,20 @@ namespace Collider2DTools.Tests
             var line = (SvgPolylineInfo)shape;
             Assert.That(line.Points.Count, Is.EqualTo(2));
             AssertVector2(line.Points[0], 1f, -2f);
+            AssertVector2(line.Points[1], 3f, -4f);
+        }
+
+        [Test]
+        public void Parse_Line_MissingEndpoints_DefaultToZero()
+        {
+            XmlElement el = LoadElement("<line x2='3' y2='4' />");
+
+            SvgShapeInfo shape = SvgShapeParser.Parse(el, 0.25f);
+
+            Assert.That(shape, Is.TypeOf<SvgPolylineInfo>());
+            var line = (SvgPolylineInfo)shape;
+            Assert.That(line.Points.Count, Is.EqualTo(2));
+            AssertVector2(line.Points[0], 0f, 0f);
             AssertVector2(line.Points[1], 3f, -4f);
         }
 
