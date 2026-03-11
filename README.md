@@ -41,24 +41,26 @@ Override these methods in a subclass:
 
 #### GetColliderTarget
 
-Signature: `GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes)`
+Signature: `GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes, string groupId)`
 
 `GetColliderTarget` is provided with arguments to allow you to decide if and where a collider component should be routed. The following context is supplied:
 - `shape`: The parsed and baked shape (`SvgCircleInfo`, `SvgRectInfo`, `SvgPolygonInfo`, or `SvgPolylineInfo`). Use this to branch by shape type and inspect geometry values like `Center`, `Radius`, `Size`, or `Points`.
 - `tags`: A list built from SVG `id` and `class` values up the traversal path. Tags are lowercased. Note that tags pulled from `id` will have underscore + number suffixes trimmed e.g. `My_ID_1234` → `my_id`. Tags are intended to provide convenience for rule-style filtering.
 - `attributes`: A read-only dictionary of the source element's attributes (for example `id`, `class`, `fill`, `stroke`, `data-*`, custom metadata). Use this when tags are not enough, or when you want fine-grained behavior based on authoring data from the SVG.
+- `groupId`: The nearest parent `<g>` id for the current shape, or `null` when unavailable.
 
 > [!NOTE]
 > The collider component may not be added directly to the target Game Object. Some cases require a child Game Object containing the collider component to be added to the target Game Object. See below.
 
 #### OnColliderCreated
 
-Signature: `void OnColliderCreated(Collider2D collider, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes)`
+Signature: `void OnColliderCreated(Collider2D collider, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes, string groupId)`
 
 `OnColliderCreated` is called after a shape has been parsed, a target Game Object has been determined, and a collider component has been added. Use this to perform post processing on the target Game Object or collider component. The following context is supplied:
 - `collider`: The collider component added. This will, in typical cases, have been added to the target Game Object determined by `GetColliderTarget`. However, some cases require adding a child Game Object. See below.
 - `tags`: Tags for the parsed shape. See `GetColliderTarget` documentation.
 - `attributes`: Attributes of the parsed SVG element. See `GetColliderTarget` documentation.
+- `groupId`: The nearest parent `<g>` id for the parsed shape, or `null` when unavailable.
 
 #### Example
 
@@ -80,15 +82,15 @@ public class ExampleSvgCollider2D : SvgCollider2D
         Walk(contents);
     }
 
-    override protected GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes)
+    override protected GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes, string groupId)
     {
         if (tags.Contains("ignore")) return null;
         return gameObject;
     }
 
-    override protected void OnColliderCreated(Collider2D collider, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes)
+    override protected void OnColliderCreated(Collider2D collider, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes, string groupId)
     {
-        Debug.Log($"Created collider for shape {collider.GetType().Name} with tags [{string.Join(", ", tags)}]");
+        Debug.Log($"Created collider for shape {collider.GetType().Name} in group '{groupId}' with tags [{string.Join(", ", tags)}]");
     }
 }
 ```

@@ -34,8 +34,31 @@ namespace Collider2DTools
         /// <param name="shape">The parsed and baked SVG shape being converted to a collider.</param>
         /// <param name="tags">Collected tag tokens from SVG id/class attributes in the current traversal path.</param>
         /// <param name="attributes">Read-only map of attributes from the source SVG element.</param>
+        /// <param name="groupId">The nearest parent <c>g</c> element ID for the shape element, or <c>null</c> if none.</param>
+        /// <returns>The target GameObject to receive the collider, or <c>null</c> to skip collider creation.</returns>
+        protected virtual GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes, string groupId)
+            => GetColliderTarget(shape, tags, attributes);
+
+        /// <summary>
+        /// Returns the GameObject that should receive the collider for the current shape.
+        /// Override to route colliders to custom targets.
+        /// </summary>
+        /// <param name="shape">The parsed and baked SVG shape being converted to a collider.</param>
+        /// <param name="tags">Collected tag tokens from SVG id/class attributes in the current traversal path.</param>
+        /// <param name="attributes">Read-only map of attributes from the source SVG element.</param>
         /// <returns>The target GameObject to receive the collider, or <c>null</c> to skip collider creation.</returns>
         protected virtual GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes) => gameObject;
+
+        /// <summary>
+        /// Called after a collider is created and configured.
+        /// Override to apply additional setup (layer, physics material, metadata, etc.).
+        /// </summary>
+        /// <param name="collider">The newly created collider component.</param>
+        /// <param name="tags">Collected tag tokens from SVG id/class attributes in the current traversal path.</param>
+        /// <param name="attributes">Read-only map of attributes from the source SVG element.</param>
+        /// <param name="groupId">The nearest parent <c>g</c> element ID for the shape element, or <c>null</c> if none.</param>
+        protected virtual void OnColliderCreated(Collider2D collider, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes, string groupId)
+            => OnColliderCreated(collider, tags, attributes);
 
         /// <summary>
         /// Called after a collider is created and configured.
@@ -52,7 +75,7 @@ namespace Collider2DTools
         /// <param name="svgXml">Raw SVG XML text.</param>
         protected void Walk(string svgXml)
         {
-            var doc = new XmlDocument { XmlResolver = null }; // avoid external entity resolution
+            var doc = new XmlDocument { XmlResolver = null }; // Avoid external entity resolution
             doc.LoadXml(svgXml);
 
             XmlElement root = doc.DocumentElement;
@@ -83,19 +106,22 @@ namespace Collider2DTools
             Walk(reader.ReadToEnd());
         }
 
-        private void WalkNode(XmlElement el, List<string> tags, Matrix3x3 accumulatedTransform)
+        private void WalkNode(XmlElement el, List<string> tags, Matrix3x3 accumulatedTransform, string groupId = null)
         {
             int pushed = PushTags(el.GetAttribute("id"), tags, true);
             pushed += PushTags(el.GetAttribute("class"), tags);
 
+            string nextGroupId = groupId;
+            if (el.LocalName == "g") nextGroupId = ParseGroupId(el.GetAttribute("id"));
+
             Matrix3x3 nextTransform = accumulatedTransform * SvgTransformParser.Parse(el.GetAttribute("transform"));
 
-            if (!TryCreateCollider(el, tags, nextTransform))
+            if (!TryCreateCollider(el, tags, nextTransform, groupId))
             {
                 for (int i = 0; i < el.ChildNodes.Count; i++)
                 {
                     if (el.ChildNodes[i] is XmlElement child)
-                        WalkNode(child, tags, nextTransform);
+                        WalkNode(child, tags, nextTransform, nextGroupId);
                 }
             }
 
@@ -103,14 +129,14 @@ namespace Collider2DTools
                 tags.RemoveRange(tags.Count - pushed, pushed);
         }
 
-        private bool TryCreateCollider(XmlElement el, List<string> tags, Matrix3x3 accumulatedTransform)
+        private bool TryCreateCollider(XmlElement el, List<string> tags, Matrix3x3 accumulatedTransform, string groupId)
         {
             SvgShapeInfo shape = SvgShapeParser.Parse(el, _curveUnitResolution);
             if (shape == null) return false;
             shape.Bake(accumulatedTransform);
 
             IReadOnlyDictionary<string, string> attributes = GetAttributes(el);
-            GameObject target = GetColliderTarget(shape, tags, attributes);
+            GameObject target = GetColliderTarget(shape, tags, attributes, groupId);
             if (target == null) return true;
 
             GameObject colliderTarget = target;
@@ -159,8 +185,14 @@ namespace Collider2DTools
                     throw new System.NotSupportedException($"Unsupported SVG shape type: {shape.GetType().Name}");
             }
 
-            OnColliderCreated(collider, tags, attributes);
+            OnColliderCreated(collider, tags, attributes, groupId);
             return true;
+        }
+
+        private static string ParseGroupId(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return null;
+            return id.Trim();
         }
 
         private static IReadOnlyDictionary<string, string> GetAttributes(XmlElement el)
