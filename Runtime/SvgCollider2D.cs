@@ -168,7 +168,7 @@ namespace Collider2DTools
             GameObject colliderTarget = target;
             if (shape.HasRotation)
             {
-                colliderTarget = new GameObject();
+                colliderTarget = new GameObject { layer = target.layer };
                 colliderTarget.transform.SetParent(target.transform, false);
                 colliderTarget.transform.localPosition = shape.Center;
                 colliderTarget.transform.localRotation = Quaternion.Euler(0f, 0f, shape.RotationDeg);
