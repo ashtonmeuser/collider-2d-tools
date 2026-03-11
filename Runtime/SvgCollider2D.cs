@@ -23,6 +23,13 @@ namespace Collider2DTools
         [Tooltip("Approximate curve sampling interval in world units when tessellating SVG bezier path segments.")]
         [SerializeField] private float _curveUnitResolution = 0.5f;
 
+        /// <summary>
+        /// Optional regex used to accept and normalize tag tokens collected from SVG <c>id</c> and <c>class</c> attributes.
+        /// Tokens that do not match this pattern are ignored. If the match contains capture groups, the first capture
+        /// group is used as the stored tag value. Return <c>null</c> to accept normalized tokens as-is.
+        /// </summary>
+        protected virtual Regex TagPattern => null;
+
         protected virtual void Awake()
         {
             if (_staticSvg != null && enabled)
@@ -229,15 +236,25 @@ namespace Collider2DTools
             return new ReadOnlyDictionary<string, string>(attributes);
         }
 
-        private static int PushTags(string tag, List<string> tags, bool trimSuffix = false)
+        private int PushTags(string tag, List<string> tags, bool trimSuffix = false)
         {
             if (string.IsNullOrWhiteSpace(tag)) return 0;
             int count = 0;
             foreach (string c in tag.Split((char[])null, System.StringSplitOptions.RemoveEmptyEntries))
             {
-                string t = trimSuffix ? Regex.Replace(c, @"_\d+$", "") : c;
-                if (string.IsNullOrWhiteSpace(t)) continue;
-                tags.Add(t.ToLowerInvariant());
+                string normalizedTag = trimSuffix ? Regex.Replace(c, @"_\d+$", "") : c;
+                normalizedTag = normalizedTag.ToLowerInvariant();
+
+                if (TagPattern != null)
+                {
+                    Match match = TagPattern.Match(normalizedTag);
+                    if (!match.Success) continue; // Bail if the pattern does not match
+                    if (match.Groups.Count >= 2) normalizedTag = match.Groups[1].Value; // If a group is found, use it as the tag
+                }
+
+                if (string.IsNullOrWhiteSpace(normalizedTag)) continue;
+
+                tags.Add(normalizedTag);
                 count++;
             }
             return count;
