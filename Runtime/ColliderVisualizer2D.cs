@@ -21,6 +21,8 @@ namespace Collider2DTools
 
         private void Awake()
         {
+            if (!enabled) return;
+
             GameObject root = _root != null ? _root : gameObject;
 
             MeshFilter meshFilter = GetComponent<MeshFilter>();

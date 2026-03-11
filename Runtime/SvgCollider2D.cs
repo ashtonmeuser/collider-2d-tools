@@ -25,7 +25,7 @@ namespace Collider2DTools
 
         protected virtual void Awake()
         {
-            if (_staticSvg != null)
+            if (_staticSvg != null && enabled)
                 Walk(_staticSvg.text);
         }
 
