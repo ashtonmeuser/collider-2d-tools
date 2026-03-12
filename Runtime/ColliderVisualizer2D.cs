@@ -19,7 +19,7 @@ namespace Collider2DTools
         [SerializeField] private LineRenderer _lineRenderer;
         // TODO: Perhaps mesh renderer should also take a prefab
 
-        private void Awake()
+        private void Start()
         {
             if (!enabled) return;
 
