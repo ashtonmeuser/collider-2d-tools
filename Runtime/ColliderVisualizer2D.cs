@@ -13,11 +13,11 @@ namespace Collider2DTools
     {
         [Tooltip("Root object to scan for Collider2D components. Uses this GameObject when unset.")]
         [SerializeField] private GameObject _root;
+        [Tooltip("Include inactive Collider2D components")]
+        [SerializeField] private bool _includeInactive;
         [Tooltip("Prefab used to visualize EdgeCollider2D paths. Optional.")]
         [SerializeField] private LineRenderer _lineRenderer;
         // TODO: Perhaps mesh renderer should also take a prefab
-
-        private Mesh _mesh;
 
         private void Awake()
         {
@@ -28,7 +28,7 @@ namespace Collider2DTools
             MeshFilter meshFilter = GetComponent<MeshFilter>();
 
             var combineList = new List<CombineInstance>();
-            Collider2D[] colliders = root.GetComponentsInChildren<Collider2D>();
+            Collider2D[] colliders = root.GetComponentsInChildren<Collider2D>(_includeInactive);
 
             foreach (Collider2D collider in colliders)
             {
@@ -53,29 +53,26 @@ namespace Collider2DTools
                     combineList.Add(combine);
             }
 
-            _mesh = new Mesh();
-            _mesh.CombineMeshes(combineList.ToArray(), true, true);
+            meshFilter.mesh.CombineMeshes(combineList.ToArray(), true, true);
 
             foreach (CombineInstance ci in combineList)
                 Destroy(ci.mesh);
-
-            meshFilter.mesh = _mesh;
         }
 
         private CombineInstance? CreateCombineInstance(Collider2D collider)
         {
-            // If a Rigidbody2D is available, use its transform
+            // Temporarily force enable the collider to ensure a mesh is created
+            var previouslyEnabled = collider.enabled;
+            collider.enabled = true;
+
             Mesh mesh = collider.CreateMesh(true, true);
+
+            collider.enabled = previouslyEnabled;
+
             if (mesh == null) return null;
 
             // Mesh vertices are in world space; transform to our local space
             return new CombineInstance { mesh = mesh, transform = transform.worldToLocalMatrix };
-        }
-
-        private void OnDestroy()
-        {
-            if (_mesh != null)
-                Destroy(_mesh);
         }
     }
 }
