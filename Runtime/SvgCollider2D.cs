@@ -28,7 +28,7 @@ namespace Collider2DTools
         /// Tokens that do not match this pattern are ignored. If the match contains capture groups, the first capture
         /// group is used as the stored tag value. Return <c>null</c> to accept normalized tokens as-is.
         /// </summary>
-        protected virtual Regex TagPattern => null;
+        protected virtual Regex TagPattern { get; set; }
 
         protected virtual void Awake()
         {
