@@ -90,7 +90,7 @@ namespace Collider2DTools.Tests
 
             Assert.That(shape, Is.TypeOf<SvgPolygonInfo>());
             var polygon = (SvgPolygonInfo)shape;
-            Assert.That(polygon.Points.Count, Is.EqualTo(3));
+            Assert.That(polygon.Points.Length, Is.EqualTo(3));
             AssertVector2(polygon.Points[2], 1f, -2f);
         }
 
@@ -103,7 +103,7 @@ namespace Collider2DTools.Tests
 
             Assert.That(shape, Is.TypeOf<SvgPolylineInfo>());
             var line = (SvgPolylineInfo)shape;
-            Assert.That(line.Points.Count, Is.EqualTo(2));
+            Assert.That(line.Points.Length, Is.EqualTo(2));
             AssertVector2(line.Points[0], 1f, -2f);
             AssertVector2(line.Points[1], 3f, -4f);
         }
@@ -117,7 +117,7 @@ namespace Collider2DTools.Tests
 
             Assert.That(shape, Is.TypeOf<SvgPolylineInfo>());
             var line = (SvgPolylineInfo)shape;
-            Assert.That(line.Points.Count, Is.EqualTo(2));
+            Assert.That(line.Points.Length, Is.EqualTo(2));
             AssertVector2(line.Points[0], 0f, 0f);
             AssertVector2(line.Points[1], 3f, -4f);
         }

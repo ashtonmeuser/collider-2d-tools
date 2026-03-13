@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using NUnit.Framework;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -52,7 +51,7 @@ namespace Collider2DTools.Tests
         [Test]
         public void PolygonInfo_Bake_TransformsPointsAndRecomputesCenter()
         {
-            var polygon = new SvgPolygonInfo(new List<Vector2>
+            var polygon = new SvgPolygonInfo(new[]
             {
                 new Vector2(0f, 0f),
                 new Vector2(2f, 0f),
@@ -71,7 +70,7 @@ namespace Collider2DTools.Tests
         [Test]
         public void PolylineInfo_Bake_TransformsPointsAndRecomputesCenter()
         {
-            var polyline = new SvgPolylineInfo(new List<Vector2>
+            var polyline = new SvgPolylineInfo(new[]
             {
                 new Vector2(1f, 1f),
                 new Vector2(3f, 1f)

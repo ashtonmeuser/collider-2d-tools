@@ -36,7 +36,7 @@ namespace Collider2DTools
 
             if (name == "polygon")
             {
-                if (!TryParsePoints(el.GetAttribute("points"), out List<Vector2> points) || points.Count < 3)
+                if (!TryParsePoints(el.GetAttribute("points"), out Vector2[] points) || points.Length < 3)
                     return null;
 
                 return new SvgPolygonInfo(points);
@@ -44,7 +44,7 @@ namespace Collider2DTools
 
             if (name == "polyline")
             {
-                if (!TryParsePoints(el.GetAttribute("points"), out List<Vector2> points) || points.Count < 2)
+                if (!TryParsePoints(el.GetAttribute("points"), out Vector2[] points) || points.Length < 2)
                     return null;
 
                 return new SvgPolylineInfo(points);
@@ -68,7 +68,7 @@ namespace Collider2DTools
                 if (!SvgPathParser.Parse(el.GetAttribute("d"), curveUnitResolution, out List<Vector2> points, out bool isClosed))
                     return null;
 
-                return isClosed ? new SvgPolygonInfo(points) : new SvgPolylineInfo(points);
+                return isClosed ? new SvgPolygonInfo(points.ToArray()) : new SvgPolylineInfo(points.ToArray());
             }
 
             return null;
@@ -85,21 +85,23 @@ namespace Collider2DTools
             return float.TryParse(attribute, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
         }
 
-        private static bool TryParsePoints(string pointsAttr, out List<Vector2> points)
+        private static bool TryParsePoints(string pointsAttr, out Vector2[] points)
         {
-            points = new List<Vector2>();
+            points = null;
             if (string.IsNullOrWhiteSpace(pointsAttr)) return false;
 
             MatchCollection matches = PointNumberRegex.Matches(pointsAttr);
             if (matches.Count < 6 || (matches.Count % 2) != 0) return false;
 
-            for (int i = 0; i < matches.Count; i += 2)
+            points = new Vector2[matches.Count / 2];
+
+            for (int i = 0, pointIndex = 0; i < matches.Count; i += 2, pointIndex++)
             {
                 if (!float.TryParse(matches[i].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float x))
                     return false;
                 if (!float.TryParse(matches[i + 1].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float y))
                     return false;
-                points.Add(new Vector2(x, -y));
+                points[pointIndex] = new Vector2(x, -y);
             }
 
             return true;

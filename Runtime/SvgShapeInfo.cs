@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Collider2DTools
@@ -88,13 +87,13 @@ namespace Collider2DTools
 
     public sealed class SvgPolygonInfo : SvgShapeInfo
     {
-        public IReadOnlyList<Vector2> Points => _points;
-        private readonly List<Vector2> _points;
+        public Vector2[] Points => _points;
+        private readonly Vector2[] _points;
 
-        public SvgPolygonInfo(IReadOnlyList<Vector2> points)
+        public SvgPolygonInfo(Vector2[] points)
             : base(SvgShapeKind.Polygon, ComputeCenter(points))
         {
-            _points = points == null ? new List<Vector2>() : new List<Vector2>(points);
+            _points = points;
         }
 
         public override void Bake(Matrix3x3 transform)
@@ -102,31 +101,31 @@ namespace Collider2DTools
             Vector2 scale = transform.scale;
             Vector2 translation = transform.translation;
 
-            for (int i = 0; i < _points.Count; i++)
+            for (int i = 0; i < _points.Length; i++)
                 _points[i] = Rotate2D(Vector2.Scale(_points[i], scale), transform.rotation) + translation;
 
             Center = ComputeCenter(_points);
         }
 
-        private static Vector2 ComputeCenter(IReadOnlyList<Vector2> points)
+        private static Vector2 ComputeCenter(Vector2[] points)
         {
-            if (points == null || points.Count == 0) return Vector2.zero;
+            if (points == null || points.Length == 0) return Vector2.zero;
             Vector2 sum = Vector2.zero;
-            for (int i = 0; i < points.Count; i++)
+            for (int i = 0; i < points.Length; i++)
                 sum += points[i];
-            return sum / points.Count;
+            return sum / points.Length;
         }
     }
 
     public sealed class SvgPolylineInfo : SvgShapeInfo
     {
-        public IReadOnlyList<Vector2> Points => _points;
-        private readonly List<Vector2> _points;
+        public Vector2[] Points => _points;
+        private readonly Vector2[] _points;
 
-        public SvgPolylineInfo(IReadOnlyList<Vector2> points)
+        public SvgPolylineInfo(Vector2[] points)
             : base(SvgShapeKind.Polyline, ComputeCenter(points))
         {
-            _points = points == null ? new List<Vector2>() : new List<Vector2>(points);
+            _points = points;
         }
 
         public override void Bake(Matrix3x3 transform)
@@ -134,19 +133,19 @@ namespace Collider2DTools
             Vector2 scale = transform.scale;
             Vector2 translation = transform.translation;
 
-            for (int i = 0; i < _points.Count; i++)
+            for (int i = 0; i < _points.Length; i++)
                 _points[i] = Rotate2D(Vector2.Scale(_points[i], scale), transform.rotation) + translation;
 
             Center = ComputeCenter(_points);
         }
 
-        private static Vector2 ComputeCenter(IReadOnlyList<Vector2> points)
+        private static Vector2 ComputeCenter(Vector2[] points)
         {
-            if (points == null || points.Count == 0) return Vector2.zero;
+            if (points == null || points.Length == 0) return Vector2.zero;
             Vector2 sum = Vector2.zero;
-            for (int i = 0; i < points.Count; i++)
+            for (int i = 0; i < points.Length; i++)
                 sum += points[i];
-            return sum / points.Count;
+            return sum / points.Length;
         }
     }
 }

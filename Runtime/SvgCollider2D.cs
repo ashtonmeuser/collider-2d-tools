@@ -1,7 +1,6 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using UnityEngine;
@@ -196,14 +195,14 @@ namespace Collider2DTools
                 case SvgPolygonInfo polygon:
                 {
                     var c = colliderTarget.AddComponent<PolygonCollider2D>();
-                    c.points = polygon.Points.ToArray();
+                    c.points = polygon.Points;
                     collider = c;
                     break;
                 }
                 case SvgPolylineInfo polyline:
                 {
                     var c = colliderTarget.AddComponent<EdgeCollider2D>();
-                    c.points = polyline.Points.ToArray();
+                    c.points = polyline.Points;
                     collider = c;
                     break;
                 }
