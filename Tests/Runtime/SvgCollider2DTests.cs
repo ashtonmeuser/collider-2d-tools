@@ -40,10 +40,54 @@ namespace Collider2DTools.Tests
             Object.DestroyImmediate(go);
         }
 
+        [Test]
+        public void Walk_CallsOnDocumentCreatedWithDocumentDimensions()
+        {
+            var go = new GameObject("SvgCollider2DTests");
+            var collider = go.AddComponent<TestableSvgCollider2D>();
+
+            const string svg = @"
+<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'>
+  <rect x='0' y='0' width='1' height='1' />
+</svg>";
+
+            collider.Parse(svg);
+
+            Assert.That(collider.Documents.Count, Is.EqualTo(1));
+            Assert.That(collider.Documents[0].Width, Is.EqualTo(12f));
+            Assert.That(collider.Documents[0].Height, Is.EqualTo(8f));
+            Assert.That(collider.Documents[0].Attributes["width"], Is.EqualTo("12"));
+            Assert.That(collider.Documents[0].Attributes["height"], Is.EqualTo("8"));
+
+            Object.DestroyImmediate(go);
+        }
+
+        [Test]
+        public void Walk_ContinuesTraversingChildrenAfterOnDocumentCreated()
+        {
+            var go = new GameObject("SvgCollider2DTests");
+            var collider = go.AddComponent<TestableSvgCollider2D>();
+
+            const string svg = @"
+<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'>
+  <rect x='0' y='0' width='1' height='1' />
+</svg>";
+
+            collider.Parse(svg);
+
+            Assert.That(collider.Documents.Count, Is.EqualTo(1));
+            Assert.That(collider.TargetParentGroupIds.Count, Is.EqualTo(1));
+            Assert.That(collider.CreatedParentGroupIds.Count, Is.EqualTo(1));
+            Assert.That(go.GetComponents<Collider2D>().Length, Is.EqualTo(1));
+
+            Object.DestroyImmediate(go);
+        }
+
         private sealed class TestableSvgCollider2D : SvgCollider2D
         {
             public List<string> TargetParentGroupIds { get; } = new List<string>();
             public List<string> CreatedParentGroupIds { get; } = new List<string>();
+            public List<DocumentHookCall> Documents { get; } = new List<DocumentHookCall>();
 
             public void Parse(string svg)
             {
@@ -59,6 +103,25 @@ namespace Collider2DTools.Tests
             protected override void OnColliderCreated(Collider2D collider, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes, string parentGroupId)
             {
                 CreatedParentGroupIds.Add(parentGroupId);
+            }
+
+            protected override void OnDocumentCreated(SvgDocumentInfo document, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes)
+            {
+                Documents.Add(new DocumentHookCall(document.Width, document.Height, attributes));
+            }
+        }
+
+        private readonly struct DocumentHookCall
+        {
+            public float Width { get; }
+            public float Height { get; }
+            public IReadOnlyDictionary<string, string> Attributes { get; }
+
+            public DocumentHookCall(float width, float height, IReadOnlyDictionary<string, string> attributes)
+            {
+                Width = width;
+                Height = height;
+                Attributes = attributes;
             }
         }
     }
