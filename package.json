@@ -1,6 +1,6 @@
 {
   "name": "com.ashtonmeuser.collider-2d-tools",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "displayName": "Collider 2D Tools",
   "description": "Tools for working with 2D colliders in Unity.",
   "unity": "2022.1",
