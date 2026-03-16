@@ -4,6 +4,7 @@ namespace Collider2DTools
 {
     public enum SvgShapeKind
     {
+        Svg,
         Circle,
         Rect,
         Polygon,
@@ -35,6 +36,29 @@ namespace Collider2DTools
                 (v.x * cos) - (v.y * sin),
                 (v.x * sin) + (v.y * cos)
             );
+        }
+    }
+
+    public sealed class SvgDocumentInfo : SvgShapeInfo
+    {
+        public float Width { get; private set; }
+        public float Height { get; private set; }
+
+        public SvgDocumentInfo(float width, float height)
+            : base(SvgShapeKind.Svg, new Vector2(width * 0.5f, -height * 0.5f))
+        {
+            Width = width;
+            Height = height;
+        }
+
+        public override void Bake(Matrix3x3 transform)
+        {
+            Vector2 scale = transform.scale;
+            Vector2 translation = transform.translation;
+
+            Width *= scale.x;
+            Height *= scale.y;
+            Center = Rotate2D(Vector2.Scale(Center, scale), transform.rotation) + translation;
         }
     }
 

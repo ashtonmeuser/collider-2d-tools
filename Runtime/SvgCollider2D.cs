@@ -36,6 +36,15 @@ namespace Collider2DTools
         }
 
         /// <summary>
+        /// Called when an <c>svg</c> document node is parsed and baked.
+        /// Implement to consume document-level metadata such as width and height.
+        /// </summary>
+        /// <param name="document">The parsed and baked SVG document info.</param>
+        /// <param name="tags">Collected tag tokens from SVG id/class attributes in the current traversal path.</param>
+        /// <param name="attributes">Read-only map of attributes from the source SVG element.</param>
+        protected virtual void OnDocumentCreated(SvgDocumentInfo document, IReadOnlyList<string> tags, Attributes attributes) {}
+
+        /// <summary>
         /// Determines whether the current SVG element subtree should be visited.
         /// Called after tags and attributes have been collected for the current element, and before collider
         /// creation or traversal into child elements. Return <c>false</c> to skip the current element entirely,
@@ -160,6 +169,12 @@ namespace Collider2DTools
             SvgShapeInfo shape = SvgShapeParser.Parse(el, _curveUnitResolution);
             if (shape == null) return false;
             shape.Bake(accumulatedTransform);
+
+            if (shape is SvgDocumentInfo document)
+            {
+                OnDocumentCreated(document, tags, attributes);
+                return false;
+            }
 
             GameObject target = GetColliderTarget(shape, tags, attributes, groupId);
             if (target == null) return true;

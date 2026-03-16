@@ -16,6 +16,15 @@ namespace Collider2DTools
 
             string name = el.LocalName;
 
+            if (name == "svg")
+            {
+                if (!TryParseFloat(el, "width", out float width) || !TryParseFloat(el, "height", out float height) ||
+                    width <= 0f || height <= 0f)
+                    return null;
+
+                return new SvgDocumentInfo(width, height);
+            }
+
             if (name == "circle")
             {
                 if (!TryParseFloat(el, "cx", out float cx, 0f) || !TryParseFloat(el, "cy", out float cy, 0f) ||
