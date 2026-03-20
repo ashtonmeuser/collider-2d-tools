@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -133,6 +134,18 @@ namespace Collider2DTools
         {
             using var reader = new StreamReader(svgStream);
             Walk(reader.ReadToEnd());
+        }
+
+        /// <summary>
+        /// Computes a stable hash for the current tag sequence using ordinal string comparison.
+        /// </summary>
+        /// <param name="tags">The ordered collection of tags to hash.</param>
+        /// <returns>A hash code representing the exact tag values and their order.</returns>
+        protected static int GetTagsHashCode(IReadOnlyList<string> tags)
+        {
+            var hash = new HashCode();
+            foreach (var tag in tags) hash.Add(tag, StringComparer.Ordinal);
+            return hash.ToHashCode();
         }
 
         private void WalkNode(XmlElement el, List<string> tags, Matrix3x3 accumulatedTransform, string groupId = null)
