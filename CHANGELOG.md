@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `ColliderVisualizer2D` now exposes a virtual `ShouldVisualize(Collider2D collider)` callback for filtering generated visualization output.
+- `ColliderVisualizer2D` now exposes a virtual `OnColliderVisualized(Collider2D collider)` callback that runs after a collider is included in the generated visualization output.
 
 ### Changed
 

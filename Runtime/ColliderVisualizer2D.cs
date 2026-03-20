@@ -24,6 +24,12 @@ namespace Collider2DTools
         /// <returns><c>true</c> to visualize the collider; otherwise, <c>false</c>.</returns>
         protected virtual bool ShouldVisualize(Collider2D collider) => true;
 
+        /// <summary>
+        /// Called after a collider has been incorporated into the generated visualization.
+        /// </summary>
+        /// <param name="collider">The collider that was visualized.</param>
+        protected virtual void OnColliderVisualized(Collider2D collider) { }
+
         private void Start()
         {
             if (!enabled) return;
@@ -57,11 +63,15 @@ namespace Collider2DTools
                         positions[i] = lr.useWorldSpace ? worldPoint : lr.transform.InverseTransformPoint(worldPoint);
                     }
                     lr.SetPositions(positions);
+                    OnColliderVisualized(collider);
                     continue;
                 }
 
                 if (CreateCombineInstance(collider) is { } combine)
+                {
                     combineList.Add(combine);
+                    OnColliderVisualized(collider);
+                }
             }
 
             meshFilter.mesh.CombineMeshes(combineList.ToArray(), true, true);

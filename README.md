@@ -108,6 +108,7 @@ For circles, polygons, and polylines, geometry is baked i.e. transform data incl
 `ColliderVisualizer2D` builds a mesh visualization from `Collider2D` components and draws edge colliders by copying a `LineRenderer` component.
 
 Override `ShouldVisualize(Collider2D collider)` in a subclass to filter which colliders contribute to the generated mesh and edge line renderers.
+Override `OnColliderVisualized(Collider2D collider)` to run custom logic after a collider has been included in the visualization output.
 
 ### Basic Usage
 
