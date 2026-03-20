@@ -41,9 +41,9 @@ namespace Collider2DTools
         /// Implement to consume document-level metadata such as width and height.
         /// </summary>
         /// <param name="document">The parsed and baked SVG document info.</param>
-        /// <param name="tags">Collected tag tokens from SVG id/class attributes in the current traversal path.</param>
+        /// <param name="tags">Collected unique tag tokens from SVG id/class attributes in the current traversal path.</param>
         /// <param name="attributes">Read-only map of attributes from the source SVG element.</param>
-        protected virtual void OnDocumentCreated(SvgDocumentInfo document, IReadOnlyList<string> tags, Attributes attributes) {}
+        protected virtual void OnDocumentCreated(SvgDocumentInfo document, IReadOnlyCollection<string> tags, Attributes attributes) {}
 
         /// <summary>
         /// Determines whether the current SVG element subtree should be visited.
@@ -51,22 +51,22 @@ namespace Collider2DTools
         /// creation or traversal into child elements. Return <c>false</c> to skip the current element entirely,
         /// including any supported shape on this node and all of its descendants.
         /// </summary>
-        /// <param name="tags">Collected tag tokens from SVG id/class attributes in the current traversal path.</param>
+        /// <param name="tags">Collected unique tag tokens from SVG id/class attributes in the current traversal path.</param>
         /// <param name="attributes">Read-only map of attributes from the current SVG element.</param>
         /// <param name="groupId">The nearest parent <c>g</c> element ID for the current element, or <c>null</c> if none.</param>
         /// <returns><c>true</c> to continue processing this element subtree; otherwise, <c>false</c>.</returns>
-        protected virtual bool ShouldDescend(IReadOnlyList<string> tags, Attributes attributes, string groupId) => true;
+        protected virtual bool ShouldDescend(IReadOnlyCollection<string> tags, Attributes attributes, string groupId) => true;
 
         /// <summary>
         /// Returns the GameObject that should receive the collider for the current shape.
         /// Override to route colliders to custom targets.
         /// </summary>
         /// <param name="shape">The parsed and baked SVG shape being converted to a collider.</param>
-        /// <param name="tags">Collected tag tokens from SVG id/class attributes in the current traversal path.</param>
+        /// <param name="tags">Collected unique tag tokens from SVG id/class attributes in the current traversal path.</param>
         /// <param name="attributes">Read-only map of attributes from the source SVG element.</param>
         /// <param name="groupId">The nearest parent <c>g</c> element ID for the shape element, or <c>null</c> if none.</param>
         /// <returns>The target GameObject to receive the collider, or <c>null</c> to skip collider creation.</returns>
-        protected virtual GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyList<string> tags, Attributes attributes, string groupId)
+        protected virtual GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyCollection<string> tags, Attributes attributes, string groupId)
             => GetColliderTarget(shape, tags, attributes);
 
         /// <summary>
@@ -74,20 +74,20 @@ namespace Collider2DTools
         /// Override to route colliders to custom targets.
         /// </summary>
         /// <param name="shape">The parsed and baked SVG shape being converted to a collider.</param>
-        /// <param name="tags">Collected tag tokens from SVG id/class attributes in the current traversal path.</param>
+        /// <param name="tags">Collected unique tag tokens from SVG id/class attributes in the current traversal path.</param>
         /// <param name="attributes">Read-only map of attributes from the source SVG element.</param>
         /// <returns>The target GameObject to receive the collider, or <c>null</c> to skip collider creation.</returns>
-        protected virtual GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyList<string> tags, Attributes attributes) => gameObject;
+        protected virtual GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyCollection<string> tags, Attributes attributes) => gameObject;
 
         /// <summary>
         /// Called after a collider is created and configured.
         /// Override to apply additional setup (layer, physics material, metadata, etc.).
         /// </summary>
         /// <param name="collider">The newly created collider component.</param>
-        /// <param name="tags">Collected tag tokens from SVG id/class attributes in the current traversal path.</param>
+        /// <param name="tags">Collected unique tag tokens from SVG id/class attributes in the current traversal path.</param>
         /// <param name="attributes">Read-only map of attributes from the source SVG element.</param>
         /// <param name="groupId">The nearest parent <c>g</c> element ID for the shape element, or <c>null</c> if none.</param>
-        protected virtual void OnColliderCreated(Collider2D collider, IReadOnlyList<string> tags, Attributes attributes, string groupId)
+        protected virtual void OnColliderCreated(Collider2D collider, IReadOnlyCollection<string> tags, Attributes attributes, string groupId)
             => OnColliderCreated(collider, tags, attributes);
 
         /// <summary>
@@ -95,9 +95,9 @@ namespace Collider2DTools
         /// Override to apply additional setup (layer, physics material, metadata, etc.).
         /// </summary>
         /// <param name="collider">The newly created collider component.</param>
-        /// <param name="tags">Collected tag tokens from SVG id/class attributes in the current traversal path.</param>
+        /// <param name="tags">Collected unique tag tokens from SVG id/class attributes in the current traversal path.</param>
         /// <param name="attributes">Read-only map of attributes from the source SVG element.</param>
-        protected virtual void OnColliderCreated(Collider2D collider, IReadOnlyList<string> tags, Attributes attributes) { }
+        protected virtual void OnColliderCreated(Collider2D collider, IReadOnlyCollection<string> tags, Attributes attributes) { }
 
         /// <summary>
         /// Parses SVG XML text and creates colliders for supported shapes.
@@ -112,7 +112,7 @@ namespace Collider2DTools
             if (root == null) return;
 
             // SVG uses namespaces; read LocalName not Name.
-            var tags = new List<string>();
+            var tags = new HashSet<string>(StringComparer.Ordinal);
             WalkNode(root, tags, Matrix3x3.Scale(new[] { _scale, _scale }));
         }
 
@@ -137,21 +137,25 @@ namespace Collider2DTools
         }
 
         /// <summary>
-        /// Computes a stable hash for the current tag sequence using ordinal string comparison.
+        /// Computes a stable hash for the current tag set using ordinal string comparison.
         /// </summary>
-        /// <param name="tags">The ordered collection of tags to hash.</param>
-        /// <returns>A hash code representing the exact tag values and their order.</returns>
-        protected static int GetTagsHashCode(IReadOnlyList<string> tags)
+        /// <param name="tags">The collection of tags to hash.</param>
+        /// <returns>A hash code representing the exact tag values regardless of enumeration order.</returns>
+        protected static int GetTagsHashCode(IReadOnlyCollection<string> tags)
         {
+            var orderedTags = new List<string>(tags);
+            orderedTags.Sort(StringComparer.Ordinal);
+
             var hash = new HashCode();
-            foreach (var tag in tags) hash.Add(tag, StringComparer.Ordinal);
+            foreach (var tag in orderedTags) hash.Add(tag, StringComparer.Ordinal);
             return hash.ToHashCode();
         }
 
-        private void WalkNode(XmlElement el, List<string> tags, Matrix3x3 accumulatedTransform, string groupId = null)
+        private void WalkNode(XmlElement el, HashSet<string> tags, Matrix3x3 accumulatedTransform, string groupId = null)
         {
-            int pushed = PushTags(el.GetAttribute("id"), tags, true);
-            pushed += PushTags(el.GetAttribute("class"), tags);
+            var pushed = new List<string>();
+            PushTags(el.GetAttribute("id"), tags, pushed, true);
+            PushTags(el.GetAttribute("class"), tags, pushed);
 
             string nextGroupId = groupId;
             if (el.LocalName == "g") nextGroupId = ParseGroupId(el.GetAttribute("id"));
@@ -159,7 +163,7 @@ namespace Collider2DTools
             var attributes = GetAttributes(el);
             if (!ShouldDescend(tags, attributes, nextGroupId))
             {
-                if (pushed > 0) tags.RemoveRange(tags.Count - pushed, pushed);
+                PopTags(tags, pushed);
                 return;
             }
 
@@ -174,10 +178,10 @@ namespace Collider2DTools
                 }
             }
 
-            if (pushed > 0) tags.RemoveRange(tags.Count - pushed, pushed);
+            PopTags(tags, pushed);
         }
 
-        private bool TryCreateCollider(XmlElement el, List<string> tags, Attributes attributes, Matrix3x3 accumulatedTransform, string groupId)
+        private bool TryCreateCollider(XmlElement el, HashSet<string> tags, Attributes attributes, Matrix3x3 accumulatedTransform, string groupId)
         {
             SvgShapeInfo shape = SvgShapeParser.Parse(el, _curveUnitResolution);
             if (shape == null) return false;
@@ -263,11 +267,16 @@ namespace Collider2DTools
             return new ReadOnlyDictionary<string, string>(attributes);
         }
 
-        private int PushTags(string tag, List<string> tags, bool trimSuffix = false)
+        private static void PopTags(HashSet<string> tags, List<string> pushed)
         {
-            if (string.IsNullOrWhiteSpace(tag)) return 0;
-            int count = 0;
-            foreach (string c in tag.Split((char[])null, System.StringSplitOptions.RemoveEmptyEntries))
+            for (int i = 0; i < pushed.Count; i++)
+                tags.Remove(pushed[i]);
+        }
+
+        private void PushTags(string raw, HashSet<string> tags, List<string> pushed, bool trimSuffix = false)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return;
+            foreach (string c in raw.Split((char[])null, StringSplitOptions.RemoveEmptyEntries))
             {
                 string normalizedTag = trimSuffix ? Regex.Replace(c, @"_\d+$", "") : c;
                 normalizedTag = normalizedTag.ToLowerInvariant();
@@ -281,10 +290,9 @@ namespace Collider2DTools
 
                 if (string.IsNullOrWhiteSpace(normalizedTag)) continue;
 
-                tags.Add(normalizedTag);
-                count++;
+                if (!tags.Add(normalizedTag)) continue;
+                pushed.Add(normalizedTag);
             }
-            return count;
         }
     }
 }

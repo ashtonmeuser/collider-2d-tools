@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -83,29 +84,54 @@ namespace Collider2DTools.Tests
             Object.DestroyImmediate(go);
         }
 
+        [Test]
+        public void Walk_PreservesInheritedTagsWhenChildRepeatsSameTag()
+        {
+            var go = new GameObject("SvgCollider2DTests");
+            var collider = go.AddComponent<TestableSvgCollider2D>();
+
+            const string svg = @"
+<svg xmlns='http://www.w3.org/2000/svg'>
+  <g class='shared'>
+    <rect class='shared first' x='0' y='0' width='1' height='1' />
+    <rect class='second' x='2' y='0' width='1' height='1' />
+  </g>
+</svg>";
+
+            collider.Parse(svg);
+
+            Assert.That(collider.TargetTags.Count, Is.EqualTo(2));
+            CollectionAssert.AreEquivalent(new[] { "shared", "first" }, collider.TargetTags[0]);
+            CollectionAssert.AreEquivalent(new[] { "shared", "second" }, collider.TargetTags[1]);
+
+            Object.DestroyImmediate(go);
+        }
+
         private sealed class TestableSvgCollider2D : SvgCollider2D
         {
             public List<string> TargetParentGroupIds { get; } = new List<string>();
             public List<string> CreatedParentGroupIds { get; } = new List<string>();
             public List<DocumentHookCall> Documents { get; } = new List<DocumentHookCall>();
+            public List<string[]> TargetTags { get; } = new List<string[]>();
 
             public void Parse(string svg)
             {
                 Walk(svg);
             }
 
-            protected override GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes, string parentGroupId)
+            protected override GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyCollection<string> tags, IReadOnlyDictionary<string, string> attributes, string parentGroupId)
             {
                 TargetParentGroupIds.Add(parentGroupId);
+                TargetTags.Add(tags.OrderBy(tag => tag).ToArray());
                 return gameObject;
             }
 
-            protected override void OnColliderCreated(Collider2D collider, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes, string parentGroupId)
+            protected override void OnColliderCreated(Collider2D collider, IReadOnlyCollection<string> tags, IReadOnlyDictionary<string, string> attributes, string parentGroupId)
             {
                 CreatedParentGroupIds.Add(parentGroupId);
             }
 
-            protected override void OnDocumentCreated(SvgDocumentInfo document, IReadOnlyList<string> tags, IReadOnlyDictionary<string, string> attributes)
+            protected override void OnDocumentCreated(SvgDocumentInfo document, IReadOnlyCollection<string> tags, IReadOnlyDictionary<string, string> attributes)
             {
                 Documents.Add(new DocumentHookCall(document.Width, document.Height, attributes));
             }
