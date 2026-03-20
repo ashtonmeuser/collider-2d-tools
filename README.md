@@ -105,13 +105,13 @@ For circles, polygons, and polylines, geometry is baked i.e. transform data incl
 
 ## ColliderVisualizer2D
 
-`ColliderVisualizer2D` builds a mesh visualization from `Collider2D` components and draws edge colliders with a `LineRenderer` prefab.
+`ColliderVisualizer2D` builds a mesh visualization from `Collider2D` components and draws edge colliders by copying a `LineRenderer` component.
 
 ### Basic Usage
 
-1. Add `ColliderVisualizer2D` to a GameObject with `MeshFilter` + `MeshRenderer`.
+1. Add `ColliderVisualizer2D` to a GameObject. `MeshFilter`, `MeshRenderer`, and `LineRenderer` components should be added automatically.
 2. Set **Root** to the object containing generated colliders (optional, defaults to current object).
-3. Assign a **Line Renderer** prefab if you want `EdgeCollider2D` paths visualized.
+3. Configure your renderers.
 4. Press Play to generate the visualization mesh.
 
 ### Inspector Fields
