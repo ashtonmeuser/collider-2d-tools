@@ -45,7 +45,7 @@ namespace Collider2DTools
 
             foreach (Collider2D collider in colliders)
             {
-                if (collider == null || !ShouldVisualize(collider)) continue;
+                if (collider == null || (!_includeInactive && !collider.enabled) || !ShouldVisualize(collider)) continue;
 
                 if (collider is EdgeCollider2D edge)
                 {
