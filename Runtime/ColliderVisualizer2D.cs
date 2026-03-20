@@ -16,6 +16,14 @@ namespace Collider2DTools
         [Tooltip("Include inactive Collider2D components")]
         [SerializeField] private bool _includeInactive;
 
+        /// <summary>
+        /// Determines whether a collider should be included in the generated visualization.
+        /// Return <c>false</c> to skip both mesh generation and edge line rendering for the collider.
+        /// </summary>
+        /// <param name="collider">The collider being considered for visualization.</param>
+        /// <returns><c>true</c> to visualize the collider; otherwise, <c>false</c>.</returns>
+        protected virtual bool ShouldVisualize(Collider2D collider) => true;
+
         private void Start()
         {
             if (!enabled) return;
@@ -31,7 +39,7 @@ namespace Collider2DTools
 
             foreach (Collider2D collider in colliders)
             {
-                if (collider == null) continue;
+                if (collider == null || !ShouldVisualize(collider)) continue;
 
                 if (collider is EdgeCollider2D edge)
                 {
