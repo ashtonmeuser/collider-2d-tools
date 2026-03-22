@@ -30,10 +30,14 @@ namespace Collider2DTools
         /// <param name="collider">The collider that was visualized.</param>
         protected virtual void OnColliderVisualized(Collider2D collider) { }
 
-        private void Start()
+        protected virtual void Start()
         {
             if (!enabled) return;
+            Walk();
+        }
 
+        public void Walk()
+        {
             GameObject root = _root != null ? _root : gameObject;
 
             MeshFilter meshFilter = GetComponent<MeshFilter>();

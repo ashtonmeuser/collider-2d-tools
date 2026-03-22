@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix filtering out disabled colliders when _Include Inactive_ is disabled.
 
+### Added
+
+- Expose `Walk` method on `ColliderVisualizer2D`
+
+### Changed
+
+- Virtualize `ColliderVisualizer2D.Start()`
+
 ## [0.2.1] - 2026-03-20
 
 ### Added
