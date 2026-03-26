@@ -110,6 +110,7 @@ namespace Collider2DTools
             dst.loop = src.loop;
             dst.alignment = src.alignment;
             dst.textureMode = src.textureMode;
+            dst.textureScale = src.textureScale;
             dst.numCapVertices = src.numCapVertices;
             dst.numCornerVertices = src.numCornerVertices;
             dst.generateLightingData = src.generateLightingData;
