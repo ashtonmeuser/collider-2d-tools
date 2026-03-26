@@ -11,10 +11,18 @@ namespace Collider2DTools
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(LineRenderer))]
     public class ColliderVisualizer2D : MonoBehaviour
     {
+        public enum UvMode
+        {
+            RootLocal,
+            NormalizedBounds
+        }
+
         [Tooltip("Root object to scan for Collider2D components. Uses this GameObject when unset.")]
         [SerializeField] private GameObject _root;
         [Tooltip("Include inactive Collider2D components")]
         [SerializeField] private bool _includeInactive;
+        [Tooltip("Controls how UVs are generated for the combined collider mesh.")]
+        [SerializeField] private UvMode _uvMode = UvMode.RootLocal;
 
         /// <summary>
         /// Determines whether a collider should be included in the generated visualization.
@@ -79,10 +87,24 @@ namespace Collider2DTools
             }
 
             meshFilter.mesh.CombineMeshes(combineList.ToArray(), true, true);
-            ApplyRootLocalUvs(meshFilter.mesh);
+            ApplyUvs(meshFilter.mesh, _uvMode);
 
             foreach (CombineInstance ci in combineList)
                 Destroy(ci.mesh);
+        }
+
+        private static void ApplyUvs(Mesh mesh, UvMode uvMode)
+        {
+            switch (uvMode)
+            {
+                case UvMode.NormalizedBounds:
+                    ApplyNormalizedBoundsUvs(mesh);
+                    break;
+                case UvMode.RootLocal:
+                default:
+                    ApplyRootLocalUvs(mesh);
+                    break;
+            }
         }
 
         private static void ApplyRootLocalUvs(Mesh mesh)
@@ -92,6 +114,18 @@ namespace Collider2DTools
 
             for (int i = 0; i < vertices.Length; i++)
                 uv[i] = new Vector2(vertices[i].x, vertices[i].y);
+
+            mesh.uv = uv;
+        }
+
+        private static void ApplyNormalizedBoundsUvs(Mesh mesh)
+        {
+            var vertices = mesh.vertices;
+            var uv = new Vector2[vertices.Length];
+            var bounds = mesh.bounds;
+
+            for (int i = 0; i < vertices.Length; i++)
+                uv[i] = new Vector2(Mathf.InverseLerp(bounds.min.x, bounds.max.x, vertices[i].x), Mathf.InverseLerp(bounds.min.y, bounds.max.y, vertices[i].y));
 
             mesh.uv = uv;
         }
