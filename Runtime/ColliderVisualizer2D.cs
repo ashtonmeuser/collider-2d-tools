@@ -79,9 +79,21 @@ namespace Collider2DTools
             }
 
             meshFilter.mesh.CombineMeshes(combineList.ToArray(), true, true);
+            ApplyRootLocalUvs(meshFilter.mesh);
 
             foreach (CombineInstance ci in combineList)
                 Destroy(ci.mesh);
+        }
+
+        private static void ApplyRootLocalUvs(Mesh mesh)
+        {
+            var vertices = mesh.vertices;
+            var uv = new Vector2[vertices.Length];
+
+            for (int i = 0; i < vertices.Length; i++)
+                uv[i] = new Vector2(vertices[i].x, vertices[i].y);
+
+            mesh.uv = uv;
         }
 
         private CombineInstance? CreateCombineInstance(Collider2D collider)
