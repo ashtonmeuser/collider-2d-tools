@@ -25,7 +25,7 @@ namespace Collider2DTools.Tests
 
             Assert.That(shape, Is.TypeOf<SvgCircleInfo>());
             var circle = (SvgCircleInfo)shape;
-            AssertVector2(circle.Center, 3f, -4f);
+            AssertVector2(circle.Bounds.center, 3f, -4f);
             Assert.That(circle.Radius, Is.EqualTo(2f).Within(Tolerance));
         }
 
@@ -38,7 +38,7 @@ namespace Collider2DTools.Tests
 
             Assert.That(shape, Is.TypeOf<SvgCircleInfo>());
             var circle = (SvgCircleInfo)shape;
-            AssertVector2(circle.Center, 0f, 0f);
+            AssertVector2(circle.Bounds.center, 0f, 0f);
             Assert.That(circle.Radius, Is.EqualTo(2f).Within(Tolerance));
         }
 

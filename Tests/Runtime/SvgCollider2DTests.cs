@@ -55,8 +55,8 @@ namespace Collider2DTools.Tests
             collider.Parse(svg);
 
             Assert.That(collider.Documents.Count, Is.EqualTo(1));
-            Assert.That(collider.Documents[0].Width, Is.EqualTo(12f));
-            Assert.That(collider.Documents[0].Height, Is.EqualTo(8f));
+            Assert.That(collider.Documents[0].Bounds.width, Is.EqualTo(12f));
+            Assert.That(collider.Documents[0].Bounds.height, Is.EqualTo(8f));
             Assert.That(collider.Documents[0].Attributes["width"], Is.EqualTo("12"));
             Assert.That(collider.Documents[0].Attributes["height"], Is.EqualTo("8"));
 
@@ -133,20 +133,18 @@ namespace Collider2DTools.Tests
 
             protected override void OnDocumentCreated(SvgDocumentInfo document, IReadOnlyCollection<string> tags, IReadOnlyDictionary<string, string> attributes)
             {
-                Documents.Add(new DocumentHookCall(document.Width, document.Height, attributes));
+                Documents.Add(new DocumentHookCall(document.Bounds, attributes));
             }
         }
 
         private readonly struct DocumentHookCall
         {
-            public float Width { get; }
-            public float Height { get; }
+            public Rect Bounds { get; }
             public IReadOnlyDictionary<string, string> Attributes { get; }
 
-            public DocumentHookCall(float width, float height, IReadOnlyDictionary<string, string> attributes)
+            public DocumentHookCall(Rect bounds, IReadOnlyDictionary<string, string> attributes)
             {
-                Width = width;
-                Height = height;
+                Bounds = bounds;
                 Attributes = attributes;
             }
         }

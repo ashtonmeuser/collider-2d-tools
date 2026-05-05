@@ -181,11 +181,11 @@ namespace Collider2DTools
             PopTags(tags, pushed);
         }
 
-        private bool TryCreateCollider(XmlElement el, HashSet<string> tags, Attributes attributes, Matrix3x3 accumulatedTransform, string groupId)
+        private bool TryCreateCollider(XmlElement el, HashSet<string> tags, Attributes attributes, Matrix3x3 transform, string groupId)
         {
             SvgShapeInfo shape = SvgShapeParser.Parse(el, _curveUnitResolution);
             if (shape == null) return false;
-            shape.Bake(accumulatedTransform);
+            shape.Bake(transform);
 
             if (shape is SvgDocumentInfo document)
             {
@@ -201,7 +201,7 @@ namespace Collider2DTools
             {
                 colliderTarget = new GameObject { name = "Rotated Collider", layer = target.layer };
                 colliderTarget.transform.SetParent(target.transform, false);
-                colliderTarget.transform.localPosition = shape.Center;
+                colliderTarget.transform.localPosition = shape.Bounds.center;
                 colliderTarget.transform.localRotation = Quaternion.Euler(0f, 0f, shape.RotationDeg);
             }
 
@@ -211,7 +211,7 @@ namespace Collider2DTools
                 case SvgCircleInfo circle:
                 {
                     var c = colliderTarget.AddComponent<CircleCollider2D>();
-                    c.offset = circle.Center;
+                    c.offset = circle.Bounds.center;
                     c.radius = circle.Radius;
                     collider = c;
                     break;
@@ -219,8 +219,8 @@ namespace Collider2DTools
                 case SvgRectInfo rect:
                 {
                     var c = colliderTarget.AddComponent<BoxCollider2D>();
-                    c.offset = shape.HasRotation ? Vector2.zero : rect.Center;
-                    c.size = rect.Size;
+                    c.offset = shape.HasRotation ? Vector2.zero : rect.Bounds.center;
+                    c.size = rect.Bounds.size;
                     collider = c;
                     break;
                 }
