@@ -107,6 +107,64 @@ namespace Collider2DTools.Tests
             Object.DestroyImmediate(go);
         }
 
+        [Test]
+        public void Walk_SyncsPhysicsAfterParentMovesDuringParsing()
+        {
+            var level = new GameObject("Level");
+            var staticTarget = new GameObject("Static");
+            staticTarget.transform.SetParent(level.transform, false);
+            var collider = level.AddComponent<MovingParentSvgCollider2D>();
+            collider.StaticTarget = staticTarget;
+
+            try
+            {
+                const string svg = @"
+<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'>
+  <rect class='static' x='4' y='4' width='8' height='8' />
+  <rect class='camera' x='0' y='0' width='1' height='1' />
+</svg>";
+
+                collider.Parse(svg);
+
+                var box = staticTarget.GetComponent<BoxCollider2D>();
+                Assert.That(box, Is.Not.Null);
+                AssertVector2(box.bounds.center, new Vector2(0f, 4f));
+                AssertVector2(box.bounds.size, new Vector2(8f, 8f));
+            }
+            finally
+            {
+                Object.DestroyImmediate(level);
+            }
+        }
+
+        [Test]
+        public void VisualizerWalk_SyncsPhysicsBeforeCreatingMesh()
+        {
+            var level = new GameObject("Level");
+            var staticTarget = new GameObject("Static");
+            staticTarget.transform.SetParent(level.transform, false);
+            var box = staticTarget.AddComponent<BoxCollider2D>();
+            box.offset = new Vector2(8f, -8f);
+            box.size = new Vector2(8f, 8f);
+            var visualizer = staticTarget.AddComponent<ColliderVisualizer2D>();
+
+            try
+            {
+                level.transform.position = new Vector3(-8f, 12f, 0f);
+
+                visualizer.Walk();
+
+                Mesh mesh = staticTarget.GetComponent<MeshFilter>().sharedMesh;
+                Assert.That(mesh, Is.Not.Null);
+                AssertVector2(mesh.bounds.center, box.offset);
+                AssertVector2(mesh.bounds.size, box.size);
+            }
+            finally
+            {
+                Object.DestroyImmediate(level);
+            }
+        }
+
         private sealed class TestableSvgCollider2D : SvgCollider2D
         {
             public List<string> TargetParentGroupIds { get; } = new List<string>();
@@ -135,6 +193,36 @@ namespace Collider2DTools.Tests
             {
                 Documents.Add(new DocumentHookCall(document.Bounds, attributes));
             }
+        }
+
+        private sealed class MovingParentSvgCollider2D : SvgCollider2D
+        {
+            public GameObject StaticTarget { get; set; }
+
+            public void Parse(string svg)
+            {
+                Walk(svg);
+            }
+
+            protected override GameObject GetColliderTarget(SvgShapeInfo shape, IReadOnlyCollection<string> tags, IReadOnlyDictionary<string, string> attributes, string parentGroupId)
+            {
+                if (tags.Contains("camera"))
+                {
+                    transform.localPosition = new Vector3(-8f, 12f, 0f);
+                    return null;
+                }
+
+                if (tags.Contains("static"))
+                    return StaticTarget;
+
+                return null;
+            }
+        }
+
+        private static void AssertVector2(Vector3 actual, Vector2 expected)
+        {
+            Assert.That(actual.x, Is.EqualTo(expected.x).Within(0.02f));
+            Assert.That(actual.y, Is.EqualTo(expected.y).Within(0.02f));
         }
 
         private readonly struct DocumentHookCall

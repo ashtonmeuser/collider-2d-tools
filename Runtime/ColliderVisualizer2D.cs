@@ -48,6 +48,8 @@ namespace Collider2DTools
         {
             GameObject root = _root != null ? _root : gameObject;
 
+            Physics2D.SyncTransforms(); // Ensure all colliders are up to date before visualization
+
             MeshFilter meshFilter = GetComponent<MeshFilter>();
             LineRenderer lineRenderer = GetComponent<LineRenderer>();
             lineRenderer.enabled = false; // This LineRenderer is used as a template

@@ -114,6 +114,8 @@ namespace Collider2DTools
             // SVG uses namespaces; read LocalName not Name.
             var tags = new HashSet<string>(StringComparer.Ordinal);
             WalkNode(root, tags, Matrix3x3.Scale(new[] { _scale, _scale }));
+
+            Physics2D.SyncTransforms(); // Ensure all colliders are up to date after creation
         }
 
         /// <summary>
