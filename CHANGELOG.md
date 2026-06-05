@@ -5,19 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] - 2026-06-05
 
 ### Fixed
 
 - Fix filtering out disabled colliders when _Include Inactive_ is disabled.
+- Fix stale visualizer meshes when transform edits happen in callbacks.
 
 ### Added
 
 - Expose `Walk` method on `ColliderVisualizer2D`
+- Add option for generated child collider GameObjects to copy their parent tag.
+- Add option for `SvgCollider2D` to skip fully zero-bounds shapes.
+- Add UV generation for collider visualization output.
+- Add option to normalize generated visualizer UVs.
+- Make SVG tag hash helper public.
 
 ### Changed
 
 - Virtualize `ColliderVisualizer2D.Start()`
+- Copy line renderer texture scale to generated visualizer lines.
+- Breaking: SVG shape info now exposes baked shape bounds instead of shape center.
 
 ## [0.2.1] - 2026-03-20
 
