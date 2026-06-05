@@ -143,7 +143,7 @@ namespace Collider2DTools
         /// </summary>
         /// <param name="tags">The collection of tags to hash.</param>
         /// <returns>A hash code representing the exact tag values regardless of enumeration order.</returns>
-        protected static int GetTagsHashCode(IReadOnlyCollection<string> tags)
+        public static int GetTagsHashCode(IReadOnlyCollection<string> tags)
         {
             var orderedTags = new List<string>(tags);
             orderedTags.Sort(StringComparer.Ordinal);
