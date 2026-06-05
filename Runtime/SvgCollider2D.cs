@@ -22,6 +22,8 @@ namespace Collider2DTools
         [SerializeField] private float _scale = 1f;
         [Tooltip("Approximate curve sampling interval in world units when tessellating SVG bezier path segments.")]
         [SerializeField] private float _curveUnitResolution = 0.5f;
+        [Tooltip("When generated child GameObjects are needed, copy the collider target's tag onto them.")]
+        [SerializeField] private bool _copyParentTag = true;
 
         /// <summary>
         /// Optional regex used to accept and normalize tag tokens collected from SVG <c>id</c> and <c>class</c> attributes.
@@ -202,6 +204,7 @@ namespace Collider2DTools
             if (shape.HasRotation)
             {
                 colliderTarget = new GameObject { name = "Rotated Collider", layer = target.layer };
+                if (_copyParentTag) colliderTarget.tag = target.tag;
                 colliderTarget.transform.SetParent(target.transform, false);
                 colliderTarget.transform.localPosition = shape.Bounds.center;
                 colliderTarget.transform.localRotation = Quaternion.Euler(0f, 0f, shape.RotationDeg);
