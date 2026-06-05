@@ -24,6 +24,8 @@ namespace Collider2DTools
         [SerializeField] private float _curveUnitResolution = 0.5f;
         [Tooltip("When generated child GameObjects are needed, copy the collider target's tag onto them.")]
         [SerializeField] private bool _copyParentTag = true;
+        [Tooltip("Skip shapes whose baked bounds have zero width and height.")]
+        [SerializeField] private bool _skipZeroBoundsShapes;
 
         /// <summary>
         /// Optional regex used to accept and normalize tag tokens collected from SVG <c>id</c> and <c>class</c> attributes.
@@ -196,6 +198,8 @@ namespace Collider2DTools
                 OnDocumentCreated(document, tags, attributes);
                 return false;
             }
+
+            if (_skipZeroBoundsShapes && shape.Bounds.width == 0f && shape.Bounds.height == 0f) return true;
 
             GameObject target = GetColliderTarget(shape, tags, attributes, groupId);
             if (target == null) return true;
