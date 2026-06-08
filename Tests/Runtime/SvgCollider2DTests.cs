@@ -138,6 +138,33 @@ namespace Collider2DTools.Tests
         }
 
         [Test]
+        public void Walk_UsesCompositeColliderWhenEnabledAndAvailableOnTarget()
+        {
+            var go = new GameObject("SvgCollider2DTests");
+            go.AddComponent<Rigidbody2D>();
+            go.AddComponent<CompositeCollider2D>();
+            var collider = go.AddComponent<CompositeSvgCollider2D>();
+
+            try
+            {
+                const string svg = @"
+<svg xmlns='http://www.w3.org/2000/svg'>
+  <rect x='0' y='0' width='1' height='1' />
+</svg>";
+
+                collider.Parse(svg);
+
+                var box = go.GetComponent<BoxCollider2D>();
+                Assert.That(box, Is.Not.Null);
+                Assert.That(box.compositeOperation, Is.EqualTo(Collider2D.CompositeOperation.Merge));
+            }
+            finally
+            {
+                Object.DestroyImmediate(go);
+            }
+        }
+
+        [Test]
         public void VisualizerWalk_SyncsPhysicsBeforeCreatingMesh()
         {
             var level = new GameObject("Level");
@@ -216,6 +243,17 @@ namespace Collider2DTools.Tests
                     return StaticTarget;
 
                 return null;
+            }
+        }
+
+        private sealed class CompositeSvgCollider2D : SvgCollider2D
+        {
+            public void Parse(string svg)
+            {
+                var field = typeof(SvgCollider2D).GetField("_useCompositeColliderIfAvailable", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                Assert.That(field, Is.Not.Null);
+                field.SetValue(this, true);
+                Walk(svg);
             }
         }
 

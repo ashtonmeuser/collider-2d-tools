@@ -26,6 +26,8 @@ namespace Collider2DTools
         [SerializeField] private bool _copyParentTag = true;
         [Tooltip("Skip shapes whose baked bounds have zero width and height.")]
         [SerializeField] private bool _skipZeroBoundsShapes;
+        [Tooltip("When the collider target has a CompositeCollider2D, configure generated colliders to merge into that composite.")]
+        [SerializeField] private bool _useCompositeColliderIfAvailable;
 
         /// <summary>
         /// Optional regex used to accept and normalize tag tokens collected from SVG <c>id</c> and <c>class</c> attributes.
@@ -250,6 +252,9 @@ namespace Collider2DTools
                 default:
                     throw new System.NotSupportedException($"Unsupported SVG shape type: {shape.GetType().Name}");
             }
+
+            if (_useCompositeColliderIfAvailable && target.TryGetComponent(out CompositeCollider2D _))
+                collider.compositeOperation = Collider2D.CompositeOperation.Merge;
 
             OnColliderCreated(collider, tags, attributes, groupId);
             return true;
