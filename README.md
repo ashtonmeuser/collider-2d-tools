@@ -27,6 +27,9 @@ You can simply add the shapes from a static SVG asset without extending the clas
 - **Static Svg**: SVG file parsed on `Awake`.
 - **Scale**: Global XY scale applied before collider creation.
 - **Curve Unit Resolution**: Curve sampling interval for bezier path segments.
+- **Copy Parent Tag**: Copies the collider target's tag onto generated child collider GameObjects.
+- **Skip Zero Bounds Shapes**: Skips shapes whose baked bounds have zero width and height.
+- **Use Composite Collider If Available**: Configures generated colliders to merge into a `CompositeCollider2D` when one exists on the collider target.
 
 ### Extending Behavior
 
@@ -120,7 +123,10 @@ Override `OnColliderVisualized(Collider2D collider)` to run custom logic after a
 ### Inspector Fields
 
 - **Root**: Collider search root.
-- **Line Renderer**: Prefab used for edge/polyline visualization.
+- **Include Inactive**: Includes inactive child GameObjects and disabled colliders in visualization output.
+- **Uv Mode**: Controls whether mesh UVs are generated from root-local positions or normalized mesh bounds.
+
+The `LineRenderer` component on the visualizer is used as the template for edge/polyline visualization.
 
 ## Notes
 
