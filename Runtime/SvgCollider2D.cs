@@ -253,8 +253,25 @@ namespace Collider2DTools
                     throw new NotSupportedException($"Unsupported SVG shape type: {shape.GetType().Name}");
             }
 
-            if (_useCompositeColliderIfAvailable && collider is not EdgeCollider2D && target.TryGetComponent(out CompositeCollider2D _))
-                collider.compositeOperation = Collider2D.CompositeOperation.Merge;
+            if (_useCompositeColliderIfAvailable && target.TryGetComponent(out CompositeCollider2D composite))
+            {
+                // CompositeCollider2D does not support EdgeCollider2D, but we can inherit the composite-owned properties.
+                if (collider is EdgeCollider2D _)
+                {
+                    collider.sharedMaterial = composite.sharedMaterial;
+                    collider.isTrigger = composite.isTrigger;
+                    collider.usedByEffector = composite.usedByEffector;
+                    collider.layerOverridePriority = composite.layerOverridePriority;
+                    collider.includeLayers = composite.includeLayers;
+                    collider.excludeLayers = composite.excludeLayers;
+                    collider.forceSendLayers = composite.forceSendLayers;
+                    collider.forceReceiveLayers = composite.forceReceiveLayers;
+                    collider.contactCaptureLayers = composite.contactCaptureLayers;
+                    collider.callbackLayers = composite.callbackLayers;
+                }
+                else
+                    collider.compositeOperation = Collider2D.CompositeOperation.Merge;
+            }
 
             OnColliderCreated(collider, tags, attributes, groupId);
             return true;
