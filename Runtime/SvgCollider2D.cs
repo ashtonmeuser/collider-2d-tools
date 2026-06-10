@@ -250,10 +250,10 @@ namespace Collider2DTools
                     break;
                 }
                 default:
-                    throw new System.NotSupportedException($"Unsupported SVG shape type: {shape.GetType().Name}");
+                    throw new NotSupportedException($"Unsupported SVG shape type: {shape.GetType().Name}");
             }
 
-            if (_useCompositeColliderIfAvailable && target.TryGetComponent(out CompositeCollider2D _))
+            if (_useCompositeColliderIfAvailable && collider is not EdgeCollider2D && target.TryGetComponent(out CompositeCollider2D _))
                 collider.compositeOperation = Collider2D.CompositeOperation.Merge;
 
             OnColliderCreated(collider, tags, attributes, groupId);

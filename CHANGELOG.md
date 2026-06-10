@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add option for `SvgCollider2D` to merge generated colliders into a target `CompositeCollider2D` when available.
 
+### Changed
+
+- Skip adding EdgeCollider2D to CompositeCollider2D as this is unsupported.
+
 ## [0.3.0] - 2026-06-05
 
 ### Fixed
