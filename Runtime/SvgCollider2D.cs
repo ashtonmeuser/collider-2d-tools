@@ -27,7 +27,7 @@ namespace Collider2DTools
         [Tooltip("Skip shapes whose baked bounds have zero width and height.")]
         [SerializeField] private bool _skipZeroBoundsShapes;
         [Tooltip("When the collider target has a CompositeCollider2D, configure generated colliders to merge into that composite.")]
-        [SerializeField] private bool _useCompositeColliderIfAvailable;
+        [SerializeField] private bool _useCompositeColliderIfAvailable = true;
 
         /// <summary>
         /// Optional regex used to accept and normalize tag tokens collected from SVG <c>id</c> and <c>class</c> attributes.
